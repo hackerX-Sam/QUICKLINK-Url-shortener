@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - URL Shortener</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #07111f, #0f172a 45%, #1d4ed8);
+        color: #f8fafc;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+      }
+      .login-container {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 40px;
+        width: 100%;
+        max-width: 400px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        text-align: center;
+        backdrop-filter: blur(10px);
+      }
+      h1 {
+        margin-top: 0;
+        font-size: 2rem;
+        margin-bottom: 24px;
+      }
+      .input-group {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+      .input-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+        color: #cbd5e1;
+      }
+      .input-group input {
+        width: 100%;
+        padding: 12px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.2);
+        color: white;
+        font-size: 1rem;
+        outline: none;
+      }
+      .input-group input:focus {
+        border-color: #3b82f6;
+      }
+      .btn {
+        width: 100%;
+        padding: 14px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      .btn:hover {
+        background: #1d4ed8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="login-container">
+      <h1>Welcome Back</h1>
+      <p style="color: #cbd5e1; margin-bottom: 24px;">Sign in to continue to URL Shortener</p>
+      
+      <!-- Google Sign-In Element -->
+      <div id="g_id_onload"
+         data-client_id="43495009282-bdbsqq8og9g8goteea52q8cht3s9hd6k.apps.googleusercontent.com"
+         data-context="signin"
+         data-ux_mode="popup"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+      </div>
+      <div class="g_id_signin"
+         style="display: flex; justify-content: center;"
+         data-type="standard"
+         data-shape="rectangular"
+         data-theme="filled_black"
+         data-text="signin_with"
+         data-size="large"
+         data-logo_alignment="left">
+      </div>
+
+    </div>
+
+    <script>
+      function parseJwt (token) {
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+      }
+
+      function handleCredentialResponse(response) {
+        const responsePayload = parseJwt(response.credential);
+        
+        const userProfile = {
+          name: responsePayload.name,
+          email: responsePayload.email,
+          picture: responsePayload.picture
+        };
+        sessionStorage.setItem('userProfile', JSON.stringify(userProfile));
+        
+        window.location.href = '/app';
+      }
+    </script>
+  </body>
+</html>

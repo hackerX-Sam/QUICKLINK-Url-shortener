@@ -1,0 +1,20 @@
+{
+  "name": "url-shortener-server",
+  "version": "1.0.0",
+  "description": "A simple URL shortener backend built with Express",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.1",
+    "express": "^4.21.2",
+    "nanoid": "^5.0.1"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
+  }
+}

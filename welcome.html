@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to Quicklink</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #eff6ff, #dbeafe);
+        color: #0f172a;
+        overflow: hidden;
+      }
+      .hero {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+      .card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.15);
+        padding: 36px;
+        max-width: 700px;
+        width: 100%;
+        text-align: center;
+        
+        opacity: 0;
+        transform: translateY(30px);
+        animation: fadeUp 0.8s ease forwards;
+      }
+      
+      h1 { 
+        font-size: 2.2rem; 
+        margin-bottom: 12px; 
+      }
+      
+      .typewriter-text {
+        color: #2563eb;
+        border-right: 2px solid #2563eb;
+        white-space: nowrap;
+        animation: blink 0.75s step-end infinite;
+      }
+
+      p { 
+        font-size: 1rem; 
+        line-height: 1.6; 
+        color: #475569; 
+        opacity: 0;
+        animation: fadeIn 0.8s ease 1s forwards;
+      }
+      
+      .btn {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 12px 24px;
+        background: #2563eb;
+        color: white;
+        text-decoration: none;
+        border-radius: 999px;
+        font-weight: bold;
+        opacity: 0;
+        animation: fadeIn 0.8s ease 1.5s forwards;
+        transition: transform 0.2s, background 0.2s;
+      }
+      .btn:hover { 
+        background: #1d4ed8; 
+        transform: scale(1.05);
+      }
+      
+      .features {
+        margin-top: 24px;
+        display: grid;
+        gap: 12px;
+        text-align: left;
+        opacity: 0;
+        animation: fadeIn 0.8s ease 1.2s forwards;
+      }
+      .feature {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 12px 14px;
+        transition: transform 0.2s;
+      }
+      .feature:hover {
+        transform: translateX(5px);
+      }
+
+      @keyframes fadeUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeIn {
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes blink {
+        50% { border-color: transparent; }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="hero">
+      <div class="card">
+        <h1>Welcome to <span class="typewriter-text" id="typewriter"></span></h1>
+        <p>Create short, clean links in seconds and share them easily. This app lets you shorten long URLs and redirect them instantly.</p>
+        <div class="features">
+          <div class="feature">⚡ Fast URL shortening</div>
+          <div class="feature">🔗 Simple redirect support</div>
+          <div class="feature">📊 Click tracking and link stats</div>
+        </div>
+        <a class="btn" href="/login">Open Quicklink</a>
+      </div>
+    </section>
+
+    <script>
+      // Analytics: Record Visit
+      window.addEventListener('load', () => {
+        fetch('/api/visit', { method: 'POST' }).catch(() => {});
+      });
+
+      // Typewriter Effect
+      const textToType = "Quicklink";
+      const typewriterElement = document.getElementById('typewriter');
+      let typeIndex = 0;
+
+      function typeWriter() {
+        if (typeIndex < textToType.length) {
+          typewriterElement.textContent += textToType.charAt(typeIndex);
+          typeIndex++;
+          setTimeout(typeWriter, 120);
+        } else {
+          setTimeout(() => {
+            typewriterElement.style.borderRight = 'none';
+          }, 2000);
+        }
+      }
+
+      // Start typing shortly after card fades up
+      setTimeout(typeWriter, 600);
+    </script>
+  </body>
+</html>
