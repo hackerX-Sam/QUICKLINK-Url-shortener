@@ -19,15 +19,15 @@ app.get('/health', (_req, res) => {
 });
 
 app.get('/', (_req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'welcome.html'));
+  res.sendFile(path.join(process.cwd(), 'welcome.html'));
 });
 
 app.get('/login', (_req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'login.html'));
+  res.sendFile(path.join(process.cwd(), 'login.html'));
 });
 
 app.get('/app', (_req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'index.html'));
+  res.sendFile(path.join(process.cwd(), 'index.html'));
 });
 
 app.use('/', urlRoutes);
