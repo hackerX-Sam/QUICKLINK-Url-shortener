@@ -1,8 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const storageFile = path.join(__dirname, '..', 'data', 'urls.json');
-const statsFile = path.join(__dirname, '..', 'data', 'stats.json');
+// On Vercel, the file system is read-only except for /tmp
+const dataDir = process.env.VERCEL ? '/tmp' : path.join(__dirname, '..', 'data');
+const storageFile = path.join(dataDir, 'urls.json');
+const statsFile = path.join(dataDir, 'stats.json');
 
 function ensureStorage() {
   const dir = path.dirname(storageFile);
