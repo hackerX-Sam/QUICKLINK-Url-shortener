@@ -71,12 +71,59 @@
       .btn:hover {
         background: #1d4ed8;
       }
+      .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: #94a3b8;
+        font-size: 0.85rem;
+        margin: 24px 0;
+      }
+      .divider::before, .divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .divider span {
+        padding: 0 10px;
+      }
+      .btn-guest {
+        width: 100%;
+        padding: 12px;
+        background: transparent;
+        color: #cbd5e1;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .btn-guest:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: #cbd5e1;
+        color: white;
+      }
     </style>
   </head>
   <body>
     <div class="login-container">
       <h1>Welcome Back</h1>
       <p style="color: #cbd5e1; margin-bottom: 24px;">Sign in to continue to URL Shortener</p>
+
+      <!-- Email Login Form -->
+      <form id="emailLoginForm" class="input-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" required placeholder="you@example.com" />
+        
+        <label for="password" style="margin-top: 15px;">Password</label>
+        <input type="password" id="password" required placeholder="••••••••" />
+        
+        <button type="submit" class="btn" style="margin-top: 20px;">Sign In with Email</button>
+      </form>
+
+      <div class="divider">
+        <span>OR</span>
+      </div>
       
       <!-- Google Sign-In Element -->
       <div id="g_id_onload"
@@ -87,7 +134,7 @@
          data-auto_prompt="false">
       </div>
       <div class="g_id_signin"
-         style="display: flex; justify-content: center;"
+         style="display: flex; justify-content: center; margin-bottom: 15px;"
          data-type="standard"
          data-shape="rectangular"
          data-theme="filled_black"
@@ -95,6 +142,9 @@
          data-size="large"
          data-logo_alignment="left">
       </div>
+
+      <!-- Guest Login -->
+      <button id="guestBtn" class="btn-guest">Continue as Guest</button>
 
     </div>
 
@@ -120,6 +170,33 @@
         
         window.location.href = '/app';
       }
+
+      // Email Login Handler
+      document.getElementById('emailLoginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const name = email.split('@')[0];
+        
+        const userProfile = {
+          name: name.charAt(0).toUpperCase() + name.slice(1),
+          email: email,
+          // Generate a dynamic avatar based on the name
+          picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2563eb&color=fff&size=128`
+        };
+        sessionStorage.setItem('userProfile', JSON.stringify(userProfile));
+        window.location.href = '/app';
+      });
+
+      // Guest Login Handler
+      document.getElementById('guestBtn').addEventListener('click', () => {
+        const userProfile = {
+          name: 'Guest User',
+          email: 'guest@example.com',
+          picture: 'https://ui-avatars.com/api/?name=Guest&background=64748b&color=fff&size=128'
+        };
+        sessionStorage.setItem('userProfile', JSON.stringify(userProfile));
+        window.location.href = '/app';
+      });
     </script>
   </body>
 </html>
