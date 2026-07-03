@@ -103,22 +103,64 @@
         border-color: #cbd5e1;
         color: white;
       }
+      .error-message {
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.1);
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+        font-size: 0.9rem;
+        display: none;
+      }
+      .text-link {
+        color: #60a5fa;
+        cursor: pointer;
+        font-size: 0.9rem;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 15px;
+      }
+      .text-link:hover {
+        text-decoration: underline;
+      }
     </style>
   </head>
   <body>
     <div class="login-container">
-      <h1>Welcome Back</h1>
-      <p style="color: #cbd5e1; margin-bottom: 24px;">Sign in to continue to URL Shortener</p>
+      <h1 id="formTitle">Welcome Back</h1>
+      <p id="formSubtitle" style="color: #cbd5e1; margin-bottom: 24px;">Sign in to continue to URL Shortener</p>
+
+      <div id="errorMessage" class="error-message"></div>
 
       <!-- Email Login Form -->
       <form id="emailLoginForm" class="input-group">
-        <label for="email">Email Address</label>
-        <input type="email" id="email" required placeholder="you@example.com" />
+        <label for="loginEmail">Email Address</label>
+        <input type="email" id="loginEmail" required placeholder="you@example.com" />
         
-        <label for="password" style="margin-top: 15px;">Password</label>
-        <input type="password" id="password" required placeholder="••••••••" />
+        <label for="loginPassword" style="margin-top: 15px;">Password</label>
+        <input type="password" id="loginPassword" required placeholder="••••••••" />
         
-        <button type="submit" class="btn" style="margin-top: 20px;">Sign In with Email</button>
+        <button type="submit" class="btn" style="margin-top: 20px;">Sign In</button>
+        <div style="text-align: center;">
+          <a class="text-link" id="showRegisterBtn">Don't have an account? Register</a>
+        </div>
+      </form>
+
+      <!-- Registration Form (Hidden by default) -->
+      <form id="registerForm" class="input-group hidden" style="display: none;">
+        <label for="regName">Full Name</label>
+        <input type="text" id="regName" required placeholder="John Doe" />
+
+        <label for="regEmail" style="margin-top: 15px;">Email Address</label>
+        <input type="email" id="regEmail" required placeholder="you@example.com" />
+        
+        <label for="regPassword" style="margin-top: 15px;">Password</label>
+        <input type="password" id="regPassword" required placeholder="••••••••" />
+        
+        <button type="submit" class="btn" style="margin-top: 20px;">Create Account</button>
+        <div style="text-align: center;">
+          <a class="text-link" id="showLoginBtn">Already have an account? Sign in</a>
+        </div>
       </form>
 
       <div class="divider">
@@ -171,20 +213,108 @@
         window.location.href = '/app';
       }
 
-      // Email Login Handler
-      document.getElementById('emailLoginForm').addEventListener('submit', (e) => {
+      const errorMessage = document.getElementById('errorMessage');
+      const emailLoginForm = document.getElementById('emailLoginForm');
+      const registerForm = document.getElementById('registerForm');
+      const formTitle = document.getElementById('formTitle');
+      const formSubtitle = document.getElementById('formSubtitle');
+
+      function showError(msg) {
+        errorMessage.textContent = msg;
+        errorMessage.style.display = 'block';
+      }
+
+      function hideError() {
+        errorMessage.style.display = 'none';
+      }
+
+      document.getElementById('showRegisterBtn').addEventListener('click', () => {
+        hideError();
+        emailLoginForm.style.display = 'none';
+        registerForm.style.display = 'block';
+        formTitle.textContent = 'Create Account';
+        formSubtitle.textContent = 'Sign up to manage your links';
+      });
+
+      document.getElementById('showLoginBtn').addEventListener('click', () => {
+        hideError();
+        registerForm.style.display = 'none';
+        emailLoginForm.style.display = 'block';
+        formTitle.textContent = 'Welcome Back';
+        formSubtitle.textContent = 'Sign in to continue to URL Shortener';
+      });
+
+      // Email Login Handler (Backend Auth)
+      emailLoginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('email').value;
-        const name = email.split('@')[0];
+        hideError();
         
-        const userProfile = {
-          name: name.charAt(0).toUpperCase() + name.slice(1),
-          email: email,
-          // Generate a dynamic avatar based on the name
-          picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=2563eb&color=fff&size=128`
-        };
-        sessionStorage.setItem('userProfile', JSON.stringify(userProfile));
-        window.location.href = '/app';
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        const btn = e.target.querySelector('button');
+        const oldText = btn.textContent;
+        btn.textContent = 'Signing in...';
+        btn.disabled = true;
+
+        try {
+          const res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+          });
+          const data = await res.json();
+
+          if (!res.ok) throw new Error(data.error || 'Failed to login');
+
+          const userProfile = {
+            name: data.user.name,
+            email: data.user.email,
+            picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name)}&background=2563eb&color=fff&size=128`
+          };
+          sessionStorage.setItem('userProfile', JSON.stringify(userProfile));
+          window.location.href = '/app';
+        } catch (err) {
+          showError(err.message);
+          btn.textContent = oldText;
+          btn.disabled = false;
+        }
+      });
+
+      // Registration Handler (Backend Auth)
+      registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        hideError();
+        
+        const name = document.getElementById('regName').value;
+        const email = document.getElementById('regEmail').value;
+        const password = document.getElementById('regPassword').value;
+        const btn = e.target.querySelector('button');
+        const oldText = btn.textContent;
+        btn.textContent = 'Creating account...';
+        btn.disabled = true;
+
+        try {
+          const res = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password })
+          });
+          const data = await res.json();
+
+          if (!res.ok) throw new Error(data.error || 'Failed to register');
+
+          const userProfile = {
+            name: data.user.name,
+            email: data.user.email,
+            picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(data.user.name)}&background=2563eb&color=fff&size=128`
+          };
+          sessionStorage.setItem('userProfile', JSON.stringify(userProfile));
+          window.location.href = '/app';
+        } catch (err) {
+          showError(err.message);
+          btn.textContent = oldText;
+          btn.disabled = false;
+        }
       });
 
       // Guest Login Handler

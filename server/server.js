@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 const urlRoutes = require('./routes/urlRoutes');
+const authRoutes = require('./routes/authRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -30,6 +31,7 @@ app.get('/app', (_req, res) => {
   res.sendFile(path.join(process.cwd(), 'index.html'));
 });
 
+app.use('/api/auth', authRoutes);
 app.use('/', urlRoutes);
 app.use(errorHandler);
 
